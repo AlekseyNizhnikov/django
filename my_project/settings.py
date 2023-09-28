@@ -18,17 +18,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
+import os
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rg79s8$^xs#8q5dm5k*p@71$s9f6km0hmrr7cgee^-ldw_=+hx'
-
+#SECRET_KEY = 'django-insecure-rg79s8$^xs#8q5dm5k*p@71$s9f6km0hmrr7cgee^-ldw_=+hx'
+SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = ['127.0.0.1',
-                 '10.0.2.15']
+                 '10.0.2.15',
+                 'nizhnikov.pythonanywhere.com',]
 
-
+INTERNAL_IPS = ['121.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,9 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'my_app',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,8 +82,14 @@ WSGI_APPLICATION = 'my_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'nizhnikov$default',
+        'USER': 'nizhnikov',
+        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
+        'HOST': 'nizhnikov.mysql.pythonanywhere-services.com',
+        'OPTIONS': {
+            'init_command': "SET NAMES 'utf8mb4'; SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',},
     }
 }
 
@@ -120,8 +131,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
